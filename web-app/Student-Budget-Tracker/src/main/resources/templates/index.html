@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Budget Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background: #f2f5fa;
+            color: #243047;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1e3a5f;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .card, .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000b;
+        }
+
+        .card h3 {
+            font-size: 15px;
+            color: #667085;
+        }
+
+        .amount {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .panel {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+            max-width: 500px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccd3df;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            background: #1e3a5f;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        .success {
+            color: #15803d;
+        }
+
+        .error {
+            color: #b91c1c;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .action-form {
+            display: inline;
+            margin: 0;
+        }
+
+        .delete-button {
+            width: auto;
+            padding: 8px;
+            margin-top: 5px;
+            background: #b91c1c;
+        }
+
+        .edit-link {
+            color: #1e3a5f;
+            font-weight: bold;
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Student Budget Tracker</h1>
+    <p>Manage your allowance, income, and expenses.</p>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Starting Allowance</h3>
+            <div class="amount"
+                 th:text="'₱' + ${#numbers.formatDecimal(allowance, 1, 2)}">
+                ₱5,000.00
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Total Income</h3>
+            <div class="amount"
+                 th:text="'₱' + ${#numbers.formatDecimal(income, 1, 2)}">
+                ₱0.00
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Total Expenses</h3>
+            <div class="amount"
+                 th:text="'₱' + ${#numbers.formatDecimal(expenses, 1, 2)}">
+                ₱0.00
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Remaining Balance</h3>
+            <div class="amount"
+                 th:text="'₱' + ${#numbers.formatDecimal(balance, 1, 2)}">
+                ₱5,000.00
+            </div>
+        </div>
+    </div>
+
+    <section class="panel">
+        <h2>Add a Transaction</h2>
+
+        <p class="success"
+           th:if="${success}"
+           th:text="${success}"></p>
+
+        <p class="error"
+           th:if="${error}"
+           th:text="${error}"></p>
+
+        <form action="/add" method="post">
+            <label for="type">Transaction Type</label>
+            <select id="type" name="type" required>
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+            </select>
+
+            <label for="description">Description</label>
+            <input id="description"
+                   name="description"
+                   type="text"
+                   maxlength="200"
+                   placeholder="Example: School allowance"
+                   required>
+
+            <label for="amount">Amount (₱)</label>
+            <input id="amount"
+                   name="amount"
+                   type="number"
+                   min="0.01"
+                   step="0.01"
+                   placeholder="100.00"
+                   required>
+
+            <label for="date">Date</label>
+            <input id="date"
+                   name="date"
+                   type="date"
+                   required>
+
+            <button type="submit">Save Transaction</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Transaction History</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="item, stat : ${transactions}">
+                    <td th:text="${item[0]}">INCOME</td>
+
+                    <td th:text="${item[1]}">Allowance</td>
+
+                    <td th:text="'₱' + ${#numbers.formatDecimal(T(java.lang.Double).parseDouble(item[2]), 1, 2)}">
+                        ₱100.00
+                    </td>
+
+                    <td th:text="${item[3]}">2026-10-13</td>
+
+                    <td>
+                        <a class="edit-link"
+                           th:href="@{/edit/{index}(index=${stat.index})}">
+                            Edit
+                        </a>
+
+                        <form class="action-form"
+                              th:action="@{/delete/{index}(index=${stat.index})}"
+                              method="post"
+                              onsubmit="return confirm('Delete this transaction?');">
+
+                            <button class="delete-button" type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(transactions)}">
+                    <td colspan="5">No transactions yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+</body>
+</html>

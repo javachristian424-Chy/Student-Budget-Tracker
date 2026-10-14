@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Transaction - Student Budget Tracker</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5fa;
+            color: #243047;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000b;
+        }
+
+        h1 { color: #1e3a5f; }
+
+        form {
+            display: grid;
+            gap: 12px;
+        }
+
+        input, select, button, .cancel {
+            padding: 12px;
+            border: 1px solid #ccd3df;
+            border-radius: 7px;
+            font-size: 15px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        button, .cancel {
+            background: #1e3a5f;
+            color: white;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .cancel {
+            display: block;
+            margin-top: 12px;
+            background: #667085;
+        }
+
+        .error { color: #b91c1c; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Edit Transaction</h1>
+    <p>Update the details below.</p>
+
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <form th:action="@{/edit/{index}(index=${index})}" method="post">
+        <label for="type">Transaction Type</label>
+        <select id="type" name="type" required>
+            <option value="INCOME"
+                    th:selected="${transaction[0] == 'INCOME'}">
+                Income
+            </option>
+            <option value="EXPENSE"
+                    th:selected="${transaction[0] == 'EXPENSE'}">
+                Expense
+            </option>
+        </select>
+
+        <label for="description">Description</label>
+        <input id="description" name="description"
+               type="text" maxlength="200"
+               th:value="${transaction[1]}" required>
+
+        <label for="amount">Amount (₱)</label>
+        <input id="amount" name="amount"
+               type="number" min="0.01" step="0.01"
+               th:value="${transaction[2]}" required>
+
+        <label for="date">Date</label>
+        <input id="date" name="date"
+               type="date" th:value="${transaction[3]}" required>
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <a class="cancel" th:href="@{/}">Cancel and Return</a>
+</div>
+</body>
+</html>

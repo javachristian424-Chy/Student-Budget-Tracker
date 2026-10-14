@@ -1,0 +1,19 @@
+# Java compiled files
+out/
+*.class
+
+# Maven build output
+target/
+
+# IDE and operating system files
+.idea/
+.vscode/
+.DS_Store
+
+# Personal budget data
+**/data/budget_data.csv
+
+# Environment secrets
+.env
+.env.*
+!.env.example
